@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['question'])) {
 
     $jsonData = json_encode($data);
 
-    $ch = curl_init('http://192.168.1.80:11434/api/chat');
+    $ch = curl_init('自行創建');
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
