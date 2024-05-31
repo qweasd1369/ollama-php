@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AI對話</title>
+    <meta charset="UTF-8">
+    <style>
+        /* 對話框外部容器 */
+        .chat-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        /* 聊天框容器 */
+        .conversation {
+            width: calc(100% - 50px);
+            height: 600px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* 訊息容器 */
+        .message {
+            margin-bottom: 10px;
+            clear: both;
+            overflow: hidden;
+        }
+
+        /* 頭像容器 */
+        .avatar {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 5px;
+        }
+
+        /* 本地用戶訊息 */
+        .local {
+            text-align: right;
+        }
+
+        /* 本地用戶文字訊息背景顏色 */
+        .local .text {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background-color: #DCF8C6;
+            max-width: 70%;
+        }
+
+        /* 本地用戶頭像 */
+        .local .avatar {
+            float: right;
+            margin-left: 10px;
+        }
+
+        /* 遠端用戶訊息 */
+        .remote {
+            text-align: left;
+        }
+
+        /* 遠端用戶文字訊息背景顏色 */
+        .remote .text {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background-color: #EAEAEA;
+            max-width: 70%;
+        }
+
+        /* 遠端用戶頭像 */
+        .remote .avatar {
+            float: left;
+            margin-right: 10px;
+        }
+
+        /* 頭像圖片 */
+        .avatar .pic img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        /* 用戶名稱 */
+        .name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* 下拉式選單樣式 */
+        .input-container select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        /* 輸入容器 */
+        .input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        /* 輸入框樣式 */
+        .input-container textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-right: 10px;
+            width: 800px;
+            height: 100px;
+            resize: vertical;
+        }
+
+        /* 送出按鈕樣式 */
+        .input-container button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* 清除對話按鈕樣式 */
+        .input-container button[name="clear"] {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        /* Loader styles */
+        .loader {
+            --w: 10ch;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 30px;
+            letter-spacing: var(--w);
+            width: var(--w);
+            overflow: hidden;
+            white-space: nowrap;
+            text-shadow:
+                calc(-1*var(--w)) 0,
+                calc(-2*var(--w)) 0,
+                calc(-3*var(--w)) 0,
+                calc(-4*var(--w)) 0,
+                calc(-5*var(--w)) 0,
+                calc(-6*var(--w)) 0,
+                calc(-7*var(--w)) 0,
+                calc(-8*var(--w)) 0,
+                calc(-9*var(--w)) 0;
+            animation: l16 2s infinite;
+            display: none;
+        }
+
+        .loader:before {
+            content: "Loading...";
+        }
+
+        @keyframes l16 {
+            20% {
+                text-shadow:
+                    calc(-1*var(--w)) 0,
+                    calc(-2*var(--w)) 0 red,
+                    calc(-3*var(--w)) 0,
+                    calc(-4*var(--w)) 0 #ffa516,
+                    calc(-5*var(--w)) 0 #63fff4,
+                    calc(-6*var(--w)) 0,
+                    calc(-7*var(--w)) 0,
+                    calc(-8*var(--w)) 0 green,
+                    calc(-9*var(--w)) 0;
+            }
+
+            40% {
+                text-shadow:
+                    calc(-1*var(--w)) 0,
+                    calc(-2*var(--w)) 0 red,
+                    calc(-3*var(--w)) 0 #e945e9,
+                    calc(-4*var(--w)) 0,
+                    calc(-5*var(--w)) 0 green,
+                    calc(-6*var(--w)) 0 orange,
+                    calc(-7*var(--w)) 0,
+                    calc(-8*var(--w)) 0 green,
+                    calc(-9*var(--w)) 0;
+            }
+
+            60% {
+                text-shadow:
+                    calc(-1*var(--w)) 0 lightblue,
+                    calc(-2*var(--w)) 0,
+                    calc(-3*var(--w)) 0 #e945e9,
+                    calc(-4*var(--w)) 0,
+                    calc(-5*var(--w)) 0 green,
+                    calc(-6*var(--w)) 0,
+                    calc(-7*var(--w)) 0 yellow,
+                    calc(-8*var(--w)) 0 #ffa516,
+                    calc(-9*var(--w)) 0 red;
+            }
+
+            80% {
+                text-shadow:
+                    calc(-1*var(--w)) 0 lightblue,
+                    calc(-2*var(--w)) 0 yellow,
+                    calc(-3*var(--w)) 0 #63fff4,
+                    calc(-4*var(--w)) 0 #ffa516,
+                    calc(-5*var(--w)) 0 red,
+                    calc(-6*var(--w)) 0,
+                    calc(-7*var(--w)) 0 grey,
+                    calc(-8*var(--w)) 0 #63fff4,
+                    calc(-9*var(--w)) 0;
+            }
+        }
+
+        .text {
+            font-size: 16px;
+        }
+
+        /* 將 <pre> 標籤中的程式碼框起來 */
+        .text pre {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="conversation" id="conversation"></div>
+        <div class="input-container">
+            <form id="chatForm">
+                <label for="model">請選擇語言模組：</label>
+                <select id="model" name="model">
+                    <option value="codeqwen:latest">程式問題專用語言模型</option>
+                    <option value="gemma:7b">google語言模型(7b)</option>
+                    <option value="wangrongsheng/taiwanllm-7b-v2.1-chat:latest">台灣語言模型(7b)</option>
+                    <option value="wangrongsheng/taiwanllm-13b-v2.0-chat:latest">台灣語言模型(13b)</option>
+                    <option value="jcai/llama3-taide-lx-8b-chat-alpha1:Q4_K_M" selected>台灣人開發語言模型(8b)</option>
+                    <option value="llamafamily/llama3-chinese-8b-instruct:latest">llama3中文語言模型(8b)</option>
+                    <option value="llama3-chatqa:latest">llama3-chatqa語言模型</option>
+                    <option value="llama3:latest">llama3語言模型</option>
+                </select>
+                <label style="color: #f44336;">(7b、8b、13b...代表資料量大小)</label>
+                <br><br>
+                <label for="question">請輸入問題：</label>
+                <textarea id="question" name="question" placeholder="請輸入問題" autocomplete="off" required></textarea>
+                <button type="submit">送出</button>
+                <button type="button" id="clearButton" name="clear">清除對話</button>
+                <div class="loader"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function loadConversation() {
+                $.get("get_conversation.php", function(data) {
+                    $('#conversation').html(data);
+                    var conversation = document.getElementById('conversation');
+                    conversation.scrollTop = conversation.scrollHeight;
+                });
+            }
+
+            loadConversation();
+
+            $('#chatForm').on('submit', function(e) {
+                e.preventDefault();
+                $('.loader').show();
+                $.ajax({
+                    type: 'POST',
+                    url: 'send_message.php',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        loadConversation();
+                        $('#question').val('');
+                        $('.loader').hide();
+                    }
+                });
+            });
+
+            $('#question').keydown(function(e) {
+                if (e.keyCode == 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    $('#chatForm').submit();
+                }
+            });
+
+            $('#clearButton').on('click', function() {
+                $.post("clear_conversation.php", function(response) {
+                    loadConversation();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
